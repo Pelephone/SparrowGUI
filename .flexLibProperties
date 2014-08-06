@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="sparrowGui.component.item.RichItem"/>
+    <classEntry path="sparrowGui.utils.DiyEventDispatcher"/>
+    <classEntry path="sparrowGui.components.SCombobox"/>
+    <classEntry path="sparrowGui.components.SAlert"/>
+    <classEntry path="sparrowGui.vars.ListUIVars"/>
+    <classEntry path="sparrowGui.vars.ScrollUIPanVars"/>
+    <classEntry path="sparrowGui.components.base.RichSprite"/>
+    <classEntry path="sparrowGui.uiStyle.CssComposite"/>
+    <classEntry path="sparrowGui.components.item.SButton"/>
+    <classEntry path="sparrowGui.components.item.ItemFactory"/>
+    <classEntry path="sparrowGui.i.IItemFactory"/>
+    <classEntry path="sparrowGui.components.SItemGroup"/>
+    <classEntry path="sparrowGui.i.IItemGroup"/>
+    <classEntry path="sparrowGui.components.ScrollList"/>
+    <classEntry path="sparrowGui.uiStyle.SkinComposite"/>
+    <classEntry path="sparrowGui.uiStyle.draw.CircleDraw"/>
+    <classEntry path="sparrowGui.uiStyle.draw.HookRectDraw"/>
+    <classEntry path="sparrowGui.uiStyle.draw.RadioCircleDraw"/>
+    <classEntry path="sparrowGui.view.ItemSkin"/>
+    <classEntry path="sparrowGui.view.SkinUIBase"/>
+    <classEntry path="sparrowGui.view.RichItemSkin"/>
+    <classEntry path="sparrowGui.view.RadioItemSkin"/>
+    <classEntry path="sparrowGui.uiStyle.draw.ArrowRectDraw"/>
+    <classEntry path="sparrowGui.uiStyle.UIStyleMgr"/>
+    <classEntry path="sparrowGui.i.ITreeNode"/>
+    <classEntry path="sparrowGui.i.ITreeItemFactory"/>
+    <classEntry path="sparrowGui.components.item.TreeItemFactory"/>
+    <classEntry path="sparrowGui.data.TreeComposite"/>
+    <classEntry path="sparrowGui.view.TestSkin"/>
+    <classEntry path="sparrowGui.data.ToolTipVO"/>
+    <classEntry path="sparrowGui.components.base.LayoutClip"/>
+    <classEntry path="sparrowGui.components.layout.HorizontalLayout"/>
+    <classEntry path="sparrowGui.i.IRichItem"/>
+    <classEntry path="sparrowGui.event.ComponentEvent"/>
+    <classEntry path="sparrowGui.components.item.SRadioButton"/>
+    <classEntry path="sparrowGui.components.item.SCheckButton"/>
+    <classEntry path="sparrowGui.components.SRadioGroup"/>
+    <classEntry path="sparrowGui.components.item.SComboboxItem"/>
+    <classEntry path="sparrowGui.uiStyle.UIStyleCss"/>
+    <classEntry path="sparrowGui.components.item.ItemBase"/>
+    <classEntry path="sparrowGui.components.base.BaseComponent"/>
+    <classEntry path="sparrowGui.i.ISkinCsser"/>
+    <classEntry path="sparrowGui.components.item.FoldItem"/>
+    <classEntry path="sparrowGui.components.item.ArrowButton"/>
+    <classEntry path="sparrowGui.components.base.List"/>
+    <classEntry path="sparrowGui.components.base.AlignMgr"/>
+    <classEntry path="sparrowGui.uiStyle.draw.RectDraw2"/>
+    <classEntry path="sparrowGui.uiStyle.draw.RectSprite2"/>
+    <classEntry path="sparrowGui.components.STextField"/>
+    <classEntry path="sparrowGui.components.item.SliderItem"/>
+    <classEntry path="sparrowGui.components.item.AlertButton"/>
+    <classEntry path="sparrowGui.uiStyle.draw.CloseRectDraw"/>
+    <classEntry path="sparrowGui.components.item.SMenuButton"/>
+    <classEntry path="sparrowGui.components.SearchCombobox"/>
+    <classEntry path="sparrowGui.components.SAccordion"/>
+    <classEntry path="sparrowGui.components.SButtonText"/>
+    <classEntry path="sparrowGui.components.item.SCloseButton"/>
+    <classEntry path="uiEdit.NavLibView"/>
+    <classEntry path="uiEdit.EditMgr"/>
+    <classEntry path="uiEdit.EditURLImg"/>
+    <classEntry path="uiEdit.URLScale9Img"/>
+    <classEntry path="uiEdit.TestBtn2"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>

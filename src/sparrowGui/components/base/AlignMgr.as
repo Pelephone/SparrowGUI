@@ -80,8 +80,10 @@ package sparrowGui.components.base
 			
 			tarDsp.x = startPt.x;
 			
-			// y超过舞台边界,上对齐
-			if((globalPt.y + tarDsp.height + refHeight)>SparrowMgr.stageHeight)
+			// 是否顶出了上边界
+			var isTopSide:Boolean = (globalPt.y - tarDsp.height - refHeight)<0;
+			// y超过舞台下边界,上对齐
+			if((globalPt.y + tarDsp.height + refHeight)>SparrowMgr.stageHeight && !isTopSide)
 				tarDsp.y = startPt.y - tarDsp.height;
 			else
 				tarDsp.y = startPt.y + refHeight;

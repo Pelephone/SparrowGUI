@@ -402,7 +402,7 @@ package uiEdit
 				txtItm.addEventListener(Event.CHANGE,onInpTxtChange);
 			}
 			
-			contDP.scrollRect = new Rectangle(0,0,width,height);
+//			contDP.scrollRect = new Rectangle(0,0,width,height);
 			var i:int = 0;
 			var item:DisplayObject;
 			for each (item in btnAry) 

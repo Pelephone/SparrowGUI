@@ -13,6 +13,8 @@
 */
 package uiEdit
 {
+	import asSkinStyle.ReflPositionInfo;
+	
 	import bitmapEngine.Scale9GridBitmap;
 	
 	import flash.display.Bitmap;
@@ -20,6 +22,7 @@ package uiEdit
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
+	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	
 	import utils.tools.BitmapTool;
@@ -39,6 +42,7 @@ package uiEdit
 			uiLoader.name = "uiLoader";
 			uiLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,onImgEvent);
 //			uiLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,onImgEvent);
+			dLoader.addEventListener(Event.COMPLETE,onDataLoadComplete);
 		}
 		
 		private var _uitype:String;
@@ -91,12 +95,30 @@ package uiEdit
 			if(value)
 			tmpSrc = value.replace(EditMgr.getInstance().rootPath,"");
 			
-			uiLoader.load(new URLRequest(value));
+			var ur:URLRequest = new URLRequest(value);
+			if(uiType == "custom")
+				dLoader.load(ur);
+			else
+				uiLoader.load(ur);
 		}
 		
 		private var tmpSrc:String;
 
 		public var isScale9:Boolean = false;
+		
+		private function onDataLoadComplete(e:Event):void
+		{
+			if(e.type == Event.COMPLETE)
+			{
+				if(uiLoader.parent)
+					uiLoader.parent.removeChild(uiLoader);
+				if(bg.parent)
+					bg.parent.removeChild(bg);
+				
+				var deXml:XML = XML(dLoader.data);
+				ReflPositionInfo.decodeXmlToChild(this,deXml);
+			}
+		}
 		
 		//---------------------------------------------------
 		// 加载显示
@@ -105,12 +127,13 @@ package uiEdit
 		public var bg:Scale9GridBitmap = new Scale9GridBitmap();
 		
 		public var uiLoader:Loader = new Loader();
+		private var dLoader:URLLoader = new URLLoader();
 		
 		/**
 		 * 图片加载完成
 		 * @param e
 		 */
-		private function onImgEvent(e:Event = null):void
+		private function onImgEvent(e:Event):void
 		{
 			if(e.type == Event.COMPLETE)
 			{

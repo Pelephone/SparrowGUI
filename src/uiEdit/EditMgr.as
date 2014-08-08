@@ -181,6 +181,7 @@ package uiEdit
 				ReflPositionInfo.REF_ATTR_LS = Vector.<String>(String(xml.REF_ATTR_LS).split(","));
 				ReflPositionInfo.IS_DO_DEFAULT = int(xml.IS_DO_DEFAULT) == 1;
 				ReflPositionInfo.isAttrCode = int(xml.isAttrCode) == 1;
+				ReflPositionInfo.isCreateChild = int(xml.isCreateChild) == 1;
 				
 				UIEditor.VAR_STRING = String(xml.var_tpl);
 				UIEditor.VAR_DO_STRING = String(xml.var_tpl2);
@@ -489,7 +490,12 @@ package uiEdit
 			{
 				delete xml.deCode;
 				var x2:XML = XML(saveData);
-				xml.appendChild(x2);
+//				xml.appendChild(x2);
+				if(xml.children().length()<=0)
+					xml.appendChild(x2);
+				else
+					xml.insertChildBefore(xml.children()[0],x2);
+					
 				
 				d.writeUTFBytes(xml);
 				saveStr = String(xml);

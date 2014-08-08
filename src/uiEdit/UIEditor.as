@@ -50,11 +50,23 @@ package uiEdit
 	
 	/**
 	 * UI编辑控制器,可对场景上的UI对象进行调整坐标等属性
-	 * 键盘ctrl+1,2,3,4分别带表界面上四个按钮点击的效果。ctrl+D，通过当前项的父类选下一个UI对象
-	 * 编辑器输入特殊命令可进行特殊的解析
-	 * "src:$1"通过路径加载坐标信息
-	 * "src2"自动跟据对象的类型在默认认识路径找到xml加载文件加载坐标信息 (ctrl+5功能一样)
-	 * "call"显示当前项的子项，可在列表中选中要编辑的项
+	 * 键盘ctrl+1,2,3,4分别带表界面上四个按钮点击的效果。
+	 * 键盘上下左右键可调节选中对象的x,y坐标；+-键可调节选中对象的长宽
+	 * delete 删除单个子项
+
+	 * shrit + \ 重新开始这份配置
+	 * ctrl + alt + E/D，通过当前项的父类选上一个/下一个UI对象
+	 * ctrl + alt + C 列出所有子项
+	 * ctrl + alt + T 移除容器所有子项
+	 * ctrl + alt + R 清空容器后立刻反向一次代码
+	 * ctrl + alt 上下 向上向下元素换位置
+	 
+	 * wr2 + "子项代码"：生成文件到skinCfgPath对应的路径
+	 * wr:$1 + "子项代码"：生成文件到$1对应的路径
+	 * call + "子项"：列出当前对象的所有子项供选择(或者ctrl+c快捷键)
+	 * src:$1 + "反向代码":读取$1路径的内容显示反向代码
+	 * src2 + "反向代码"：读取skinCfgPath对应的路径反向代码(或者ctrl+9快捷键)
+	 * clear + "删除元素"：清选中容器下的所有对象
 	 * @author Pelephone
 	 */
 	public class UIEditor extends SWindow
@@ -863,6 +875,7 @@ package uiEdit
 		private function onkeyUpHandler(event:KeyboardEvent):void
 		{
 			const editTarget:DisplayObject = editMgr.editTarget;
+			var hasParent:Boolean = editTarget != null && editTarget.parent != null;
 			if (event.shiftKey)
 			{
 				var xOffext:int = 0;
@@ -920,18 +933,82 @@ package uiEdit
 				{
 					createVarString();
 				}
-				// 重挑下一个子项
-				else if (event.keyCode == Keyboard.D)
+				if(event.altKey)
 				{
-					if(editTarget && editTarget.parent)
+					// 列出子项供选择
+					if (event.keyCode == Keyboard.C)
 					{
-						var tid:int = editTarget.parent.getChildIndex(editTarget);
-						tid = tid + 1;
-						if(tid >= editTarget.parent.numChildren)
-							tid = 0;
-						setEditTarget(editTarget.parent.getChildAt(tid));
+						txtInput.text = "call";
+						onChildClick();
+					}
+					// 重挑下一个子项
+					else if (event.keyCode == Keyboard.D)
+					{
+						if(hasParent)
+						{
+							var tid:int = editTarget.parent.getChildIndex(editTarget);
+							tid = tid + 1;
+							if(tid >= editTarget.parent.numChildren)
+								tid = 0;
+							setEditTarget(editTarget.parent.getChildAt(tid));
+						}
+					}
+						// 重挑上一个子项
+					else if (event.keyCode == Keyboard.E)
+					{
+						if(hasParent)
+						{
+							tid = editTarget.parent.getChildIndex(editTarget);
+							tid = tid - 1;
+							if(tid < 0)
+								tid = editTarget.parent.numChildren;
+							setEditTarget(editTarget.parent.getChildAt(tid));
+						}
+					}
+					// 对象向上向下换位置
+					else if (event.keyCode == Keyboard.UP)
+					{
+						if(hasParent)
+						{
+							tid = editTarget.parent.getChildIndex(editTarget);
+							var tid2:int = tid - 1;
+							if(tid2 >= 0)
+								editTarget.parent.swapChildrenAt(tid,tid2);
+						}
+					}
+					else if (event.keyCode == Keyboard.DOWN)
+					{
+						if(hasParent)
+						{
+							tid = editTarget.parent.getChildIndex(editTarget);
+							tid2 = tid + 1;
+							if(tid2<editTarget.parent.numChildren)
+								editTarget.parent.swapChildrenAt(tid,tid2);
+						}
+					}
+						// 删除所有子项
+					else if (event.keyCode == Keyboard.T)
+					{
+						txtInput.text = "clear";
+						onRemoveTarget(null);
+					}
+						// 删除所有子项后立刻进行一次反向代码
+					else if (event.keyCode == Keyboard.R)
+					{
+						txtInput.text = "clear";
+						onRemoveTarget(null);
+						txtInput.text = "src2";
+						onDeCodeClick();
 					}
 				}
+			}
+				// 删除单个子项
+			else if (event.keyCode == Keyboard.DELETE)
+			{
+				if(hasParent)
+					editMgr.editTarget.parent.removeChild(editMgr.editTarget);
+				
+				setEditTarget(null);
 			}
 			else if (event.keyCode == Keyboard.LEFT)
 				xOffext = -1;

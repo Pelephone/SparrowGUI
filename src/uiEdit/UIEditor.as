@@ -978,6 +978,11 @@ package uiEdit
 						txtInput.text = "src2";
 						onDeCodeClick();
 					}
+					else if (event.keyCode == Keyboard.V)
+					{
+						txtInput.text = "wt2";
+						onDeCodeClick();
+					}
 				}
 			}
 				// 删除单个子项

@@ -13,8 +13,6 @@
 */
 package uiEdit
 {
-	import asSkinStyle.ReflPositionInfo;
-	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Stage;
@@ -29,6 +27,8 @@ package uiEdit
 	import flash.net.URLRequest;
 	import flash.system.System;
 	import flash.utils.ByteArray;
+	
+	import asSkinStyle.ReflPositionInfo;
 	
 	import sparrowGui.SparrowMgr;
 	import sparrowGui.components.base.BaseTip;
@@ -503,8 +503,11 @@ package uiEdit
 			}
 			else
 			{
-				d.writeUTFBytes(saveData);
-				saveStr = saveData;
+				xml = XML(<root/>);
+				x2 = XML(saveData);
+				xml.appendChild(x2);
+				d.writeUTFBytes(xml);
+				saveStr = xml;
 				fileCfg.save(d,saveName);
 			}
 			System.setClipboard(saveStr);

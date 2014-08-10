@@ -964,27 +964,6 @@ package uiEdit
 							setEditTarget(editTarget.parent.getChildAt(tid));
 						}
 					}
-					// 对象向上向下换位置
-					else if (event.keyCode == Keyboard.UP)
-					{
-						if(hasParent)
-						{
-							tid = editTarget.parent.getChildIndex(editTarget);
-							var tid2:int = tid - 1;
-							if(tid2 >= 0)
-								editTarget.parent.swapChildrenAt(tid,tid2);
-						}
-					}
-					else if (event.keyCode == Keyboard.DOWN)
-					{
-						if(hasParent)
-						{
-							tid = editTarget.parent.getChildIndex(editTarget);
-							tid2 = tid + 1;
-							if(tid2<editTarget.parent.numChildren)
-								editTarget.parent.swapChildrenAt(tid,tid2);
-						}
-					}
 						// 删除所有子项
 					else if (event.keyCode == Keyboard.T)
 					{
@@ -1025,6 +1004,27 @@ package uiEdit
 				wOffset = -1;
 			else if (event.keyCode == Keyboard.NUMPAD_MULTIPLY)
 				wOffset = 1;
+				// 对象向上向下换位置
+			else if (event.keyCode == Keyboard.PAGE_DOWN)
+			{
+				if(hasParent)
+				{
+					tid = editTarget.parent.getChildIndex(editTarget);
+					var tid2:int = tid - 1;
+					if(tid2 >= 0)
+						editTarget.parent.swapChildrenAt(tid,tid2);
+				}
+			}
+			else if (event.keyCode == Keyboard.PAGE_UP)
+			{
+				if(hasParent)
+				{
+					tid = editTarget.parent.getChildIndex(editTarget);
+					tid2 = tid + 1;
+					if(tid2<editTarget.parent.numChildren)
+						editTarget.parent.swapChildrenAt(tid,tid2);
+				}
+			}
 			
 			if(xOffext !=0 || yOffext != 0)
 			{

@@ -13,10 +13,6 @@
 */
 package uiEdit
 {
-	import asSkinStyle.ReflPositionInfo;
-	
-	import bitmapEngine.Scale9GridBitmap;
-	
 	import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.display.Sprite;
@@ -24,6 +20,10 @@ package uiEdit
 	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	
+	import asSkinStyle.ReflPositionInfo;
+	
+	import bitmapEngine.Scale9GridBitmap;
 	
 	import utils.tools.BitmapTool;
 	
@@ -43,6 +43,8 @@ package uiEdit
 			uiLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,onImgEvent);
 //			uiLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,onImgEvent);
 			dLoader.addEventListener(Event.COMPLETE,onDataLoadComplete);
+			
+			this.mouseChildren = false;
 		}
 		
 		private var _uitype:String;

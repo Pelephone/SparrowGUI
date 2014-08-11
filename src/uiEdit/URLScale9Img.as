@@ -265,8 +265,10 @@ package uiEdit
 				addChildAt(uiLoader,0);
 			}
 			
-			bg.width = _width;
-			bg.height = _height;
+			if(_width>0)
+				bg.width = _width;
+			if(_height>0)
+				bg.height = _height;
 			
 			if(_width > 0)
 				uiLoader.width = _width;

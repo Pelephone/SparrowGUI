@@ -219,6 +219,7 @@ package uiEdit
 				
 				skinCfgPath = String(xml.skinCfgPath);
 				
+				if(int(xml.showKey)!=0)
 				showKey = int(xml.showKey);
 				isChild = int(xml.isChild) == 1;
 				isAutoDecode = String(xml.isAutoDecode) != "0";

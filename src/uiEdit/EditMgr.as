@@ -13,6 +13,8 @@
 */
 package uiEdit
 {
+	import asSkinStyle.ReflPositionInfo;
+	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Stage;
@@ -27,8 +29,6 @@ package uiEdit
 	import flash.net.URLRequest;
 	import flash.system.System;
 	import flash.utils.ByteArray;
-	
-	import asSkinStyle.ReflPositionInfo;
 	
 	import sparrowGui.SparrowMgr;
 	import sparrowGui.components.base.BaseTip;
@@ -119,7 +119,28 @@ package uiEdit
 			
 			fileCfg.addEventListener(Event.COMPLETE,onFileSaveEvent);
 			fileCfg.addEventListener(Event.CANCEL,onFileSaveEvent);
+			
+			langLoader.addEventListener(Event.COMPLETE,onLangComplete);
 		}
+		
+		private function onLangComplete(event:Event):void
+		{
+			var str:String = String(langLoader.data);
+			var ary:Array = str.split("\n");
+			var itStr:String;
+			for each (itStr in ary) 
+			{
+				var ary2:Array = itStr.split("=");
+				if(ary2.length<2)
+					continue;
+				var val:String = String(ary2[1]).replace("\r","");
+				ReflPositionInfo.langMap[ary2[0]] = ary2[1];
+			}
+		}
+		
+		public var langObj:Object = {};
+		
+		private var langLoader:URLLoader = new URLLoader();
 		
 		/**
 		 * 扫描关键词
@@ -167,7 +188,14 @@ package uiEdit
 		{
 			var urlLd:URLRequest = new URLRequest("editCfg.xml?random=" + int(Math.random()*1000));
 			cfgLoader.load(urlLd);
+			
+			langLoader.load(new URLRequest("lang.txt?random=" + int(Math.random()*1000)));
 		}
+		
+		/**
+		 * 是否用根路径
+		 */
+		public var useRootPath:Boolean = true;
 		
 		private function onCfgEvt(event:Event):void
 		{
@@ -183,6 +211,8 @@ package uiEdit
 				ReflPositionInfo.isAttrCode = int(xml.isAttrCode) == 0;
 				ReflPositionInfo.isCreateChild = String(xml.isCreateChild) != "0";
 				ReflPositionInfo.isChangeValue = String(xml.isChangeValue) != "0";
+				
+				useRootPath = String(xml.useRootPath) != "0";
 				
 				UIEditor.VAR_STRING = String(xml.var_tpl);
 				UIEditor.VAR_DO_STRING = String(xml.var_tpl2);

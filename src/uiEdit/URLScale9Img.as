@@ -21,6 +21,7 @@ package uiEdit
 	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -43,10 +44,12 @@ package uiEdit
 			bg.name = "bg";
 			uiLoader.name = "uiLoader";
 			uiLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,onImgEvent);
-//			uiLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,onImgEvent);
+			uiLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,onImgEvent);
 			dLoader.addEventListener(Event.COMPLETE,onDataLoadComplete);
+			dLoader.addEventListener(IOErrorEvent.IO_ERROR,onDataLoadComplete);
 			
 			labelLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,onLabelComplete);
+			labelLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,onLabelComplete);
 			addChild(labelLoader);
 			
 			this.mouseChildren = false;
@@ -100,10 +103,14 @@ package uiEdit
 				return;
 			_bgSrc = value;
 			
+			var eMgr:EditMgr = EditMgr.getInstance();
 			if(value)
-			tmpSrc = value.replace(EditMgr.getInstance().rootPath,"");
+			tmpSrc = value.replace(eMgr.rootPath,"");
 			
-			var ur:URLRequest = new URLRequest(value);
+			var r:String = eMgr.rootPath;
+			if(!eMgr.useRootPath)
+				r = "";
+			var ur:URLRequest = new URLRequest(r + value);
 			if(uiType == "custom")
 				dLoader.load(ur);
 			else
@@ -126,6 +133,8 @@ package uiEdit
 				var deXml:XML = XML(dLoader.data);
 				ReflPositionInfo.decodeXmlToChild(this,deXml);
 			}
+			else
+				trace(_bgSrc + "加载错误");
 		}
 		
 		//---------------------------------------------------
@@ -150,8 +159,13 @@ package uiEdit
 		
 		private function onLabelComplete(event:Event=null):void
 		{
-			labelLoader.x = width * 0.5 - labelLoader.width * 0.5;
-			labelLoader.y = height * 0.5 - labelLoader.height * 0.5;
+			if(Event.COMPLETE)
+			{
+				labelLoader.x = width * 0.5 - labelLoader.width * 0.5;
+				labelLoader.y = height * 0.5 - labelLoader.height * 0.5;
+			}
+			else
+				trace(_labelNormal + "加载失败");
 		}
 		
 		private var _label:String = null;
@@ -167,6 +181,7 @@ package uiEdit
 				return;
 			
 			_label = value;
+			showTxt();
 		}
 		
 		private function showTxt():void
@@ -175,6 +190,7 @@ package uiEdit
 			{
 				txt = new TextField();
 				txt.autoSize = TextFieldAutoSize.LEFT;
+				addChild(txt);
 			}
 			if(!txt)
 				return;
@@ -216,9 +232,17 @@ package uiEdit
 				oldHeight = _height;
 				
 				if(_labelNormal != null)
-					labelLoader.load(new URLRequest(_labelNormal));
+				{
+					var eMgr:EditMgr = EditMgr.getInstance();
+					var r:String = eMgr.rootPath;
+					if(!eMgr.useRootPath)
+						r = "";
+					labelLoader.load(new URLRequest(r + _labelNormal));
+				}
 				draw();
 			}
+			else
+				trace(bgSrc + "加载错误");
 		}
 		
 		private var oldWidth:int;
@@ -232,13 +256,13 @@ package uiEdit
 			{
 				if(uiLoader.parent)
 					uiLoader.parent.removeChild(uiLoader);
-				addChild(bg);
+				addChildAt(bg,0);
 			}
 			else
 			{
 				if(bg.parent)
 					bg.parent.removeChild(bg);
-				addChild(uiLoader);
+				addChildAt(uiLoader,0);
 			}
 			
 			bg.width = _width;

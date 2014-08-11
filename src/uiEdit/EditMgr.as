@@ -130,6 +130,8 @@ package uiEdit
 			var itStr:String;
 			for each (itStr in ary) 
 			{
+				if(itStr.charAt(0) == "#")
+					continue;
 				var ary2:Array = itStr.split("=");
 				if(ary2.length<2)
 					continue;

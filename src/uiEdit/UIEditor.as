@@ -13,6 +13,8 @@
 */
 package uiEdit
 {
+	import asSkinStyle.ReflPositionInfo;
+	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Shape;
@@ -29,8 +31,6 @@ package uiEdit
 	import flash.text.TextFormatAlign;
 	import flash.ui.Keyboard;
 	import flash.utils.getQualifiedClassName;
-	
-	import asSkinStyle.ReflPositionInfo;
 	
 	import sparrowGui.SparrowMgr;
 	import sparrowGui.components.SButtonText;
@@ -662,8 +662,7 @@ package uiEdit
 		 */
 		private function onDeCodeClick(event:MouseEvent=null):void
 		{
-			if(!(editMgr.editTarget is DisplayObjectContainer))
-				return;
+			var tarc:DisplayObjectContainer = editMgr.editTarget as DisplayObjectContainer;
 			var destr:String = txtInput.text;
 			if(destr == "call")
 				onChildClick();
@@ -674,19 +673,23 @@ package uiEdit
 			}
 			else if(destr.indexOf("src2")==0)
 			{
-				if(destr.length == 4)
+				if(destr.length == 4 && tarc!=null)
 					src = getTarCName(editMgr.editTarget);
 				else
 					src = destr.substr(5);
 				src = editMgr.skinCfgPath.replace("$1",src);
 				loadSrc(src);
 			}
+			else if(!(editMgr.editTarget is DisplayObjectContainer))
+			{
+				return;
+			}
 			else if(destr && destr.length)
 			{
 				if(parseMode == 0)
 				{
 					var deXml:XML = XML(destr);
-					ReflPositionInfo.decodeXmlToChild(editMgr.editTarget as DisplayObjectContainer,deXml);
+					ReflPositionInfo.decodeXmlToChild(tarc,deXml);
 				}
 				else if(parseMode == 5)
 					loadSrc(editMgr.skinCfgPath);
@@ -745,6 +748,12 @@ package uiEdit
 			{
 				case Event.COMPLETE:
 				{
+					var tarc:DisplayObjectContainer = editMgr.editTarget as DisplayObjectContainer;
+					if(!tarc)
+					{
+						tarc = new Sprite();
+						SparrowMgr.mainDisp.addChild(tarc);
+					}
 					loadingContent = deCodeLoader.data;
 					if(editMgr.isAutoDecode)
 					{
@@ -752,14 +761,17 @@ package uiEdit
 						if(parseMode == 0)
 						{
 							var deXml:XML = XML(sData);
-							ReflPositionInfo.decodeXmlToChild(editMgr.editTarget as DisplayObjectContainer,deXml.decode);
-							ReflPositionInfo.decodeXmlToChild(editMgr.editTarget as DisplayObjectContainer,deXml.other);
+							var itemX:Object;
+							for each (itemX in deXml.children()) 
+							{
+								ReflPositionInfo.decodeXmlToChild(tarc,itemX);
+							}
 						}
 						else if(parseMode == 5)
 						{
 						}
 						else
-							ReflPositionInfo.decodeJsonToChild(editMgr.editTarget as DisplayObjectContainer,sData);
+							ReflPositionInfo.decodeJsonToChild(tarc,sData);
 					}
 					
 					updateEditUI();

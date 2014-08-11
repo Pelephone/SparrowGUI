@@ -176,12 +176,13 @@ package uiEdit
 				cfgData = cfgLoader.data;
 				var xml:XML = XML(cfgLoader.data);
 				parseMode = int(xml.parseMode);
-				ReflPositionInfo.IS_NEAR = int(xml.IS_NEAR) == 1;
+				ReflPositionInfo.IS_NEAR = String(xml.IS_NEAR) != "0";
 				ReflPositionInfo.INIT_ATTR_LS = Vector.<String>(String(xml.INIT_ATTR_LS).split(","));
 				ReflPositionInfo.REF_ATTR_LS = Vector.<String>(String(xml.REF_ATTR_LS).split(","));
 				ReflPositionInfo.IS_DO_DEFAULT = int(xml.IS_DO_DEFAULT) == 1;
-				ReflPositionInfo.isAttrCode = int(xml.isAttrCode) == 1;
-				ReflPositionInfo.isCreateChild = int(xml.isCreateChild) == 1;
+				ReflPositionInfo.isAttrCode = int(xml.isAttrCode) == 0;
+				ReflPositionInfo.isCreateChild = String(xml.isCreateChild) != "0";
+				ReflPositionInfo.isChangeValue = String(xml.isChangeValue) != "0";
 				
 				UIEditor.VAR_STRING = String(xml.var_tpl);
 				UIEditor.VAR_DO_STRING = String(xml.var_tpl2);
@@ -190,7 +191,7 @@ package uiEdit
 				
 				showKey = int(xml.showKey);
 				isChild = int(xml.isChild) == 1;
-				isAutoDecode = int(xml.isAutoDecode) == 1;
+				isAutoDecode = String(xml.isAutoDecode) != "0";
 				
 				searchKeyLs = Vector.<String>(String(xml.searchKeyLs).split(","));
 				uiTypeLs = Vector.<String>(String(xml.uiTypeLs).split(","));

@@ -13,6 +13,10 @@
 */
 package uiEdit
 {
+	import asSkinStyle.ReflPositionInfo;
+	
+	import bitmapEngine.Scale9GridBitmap;
+	
 	import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.display.Sprite;
@@ -20,10 +24,8 @@ package uiEdit
 	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
-	
-	import asSkinStyle.ReflPositionInfo;
-	
-	import bitmapEngine.Scale9GridBitmap;
+	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
 	
 	import utils.tools.BitmapTool;
 	
@@ -44,7 +46,11 @@ package uiEdit
 //			uiLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,onImgEvent);
 			dLoader.addEventListener(Event.COMPLETE,onDataLoadComplete);
 			
+			labelLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,onLabelComplete);
+			addChild(labelLoader);
+			
 			this.mouseChildren = false;
+			this.mouseEnabled = true;
 		}
 		
 		private var _uitype:String;
@@ -72,7 +78,7 @@ package uiEdit
 			draw();
 		}
 
-		private var _bgSrc:String;
+		public var _bgSrc:String;
 
 		/**
 		 * 背景图片路径
@@ -105,7 +111,7 @@ package uiEdit
 		}
 		
 		private var tmpSrc:String;
-
+		
 		public var isScale9:Boolean = false;
 		
 		private function onDataLoadComplete(e:Event):void
@@ -121,6 +127,63 @@ package uiEdit
 				ReflPositionInfo.decodeXmlToChild(this,deXml);
 			}
 		}
+		
+		//---------------------------------------------------
+		// 标签文字
+		//---------------------------------------------------
+		
+		private var _labelNormal:String;
+		
+		public function get labelNormal():String
+		{
+			return _labelNormal;
+		}
+		
+		public function set labelNormal(value:String):void
+		{
+			if(_labelNormal == value)
+				return;
+			_labelNormal = value;
+		}
+		
+		private var labelLoader:Loader = new Loader();
+		
+		private function onLabelComplete(event:Event=null):void
+		{
+			labelLoader.x = width * 0.5 - labelLoader.width * 0.5;
+			labelLoader.y = height * 0.5 - labelLoader.height * 0.5;
+		}
+		
+		private var _label:String = null;
+
+		public function get label():String
+		{
+			return _label;
+		}
+
+		public function set label(value:String):void
+		{
+			if(_label == value)
+				return;
+			
+			_label = value;
+		}
+		
+		private function showTxt():void
+		{
+			if(!txt && _label!=null)
+			{
+				txt = new TextField();
+				txt.autoSize = TextFieldAutoSize.LEFT;
+			}
+			if(!txt)
+				return;
+			txt.text = _label;
+			txt.x = width*0.5 - txt.width*0.5;
+			txt.y = height*0.5 - txt.height*0.5;
+		}
+
+		private var txt:TextField;
 		
 		//---------------------------------------------------
 		// 加载显示
@@ -141,16 +204,19 @@ package uiEdit
 			{
 				var dx:int = uiLoader.content.width/3;
 				var dy:int = uiLoader.content.height/3;
-				var rect:Rectangle = new Rectangle(dx,dy,dx*2,dy*2);
+				var rect:Rectangle = new Rectangle(dx,dy,dx,dy);
 				bg.scale9Grid = rect;
 				if(uiLoader.content is Bitmap)
 					bg.source = uiLoader.content;
 				else
 					bg.source = BitmapTool.toBitmap(uiLoader);
-				_width = uiLoader.content.width;
-				_height = uiLoader.content.height;
+//				_width = uiLoader.content.width;
+//				_height = uiLoader.content.height;
 				oldWidth = _width;
 				oldHeight = _height;
+				
+				if(_labelNormal != null)
+					labelLoader.load(new URLRequest(_labelNormal));
 				draw();
 			}
 		}
@@ -178,11 +244,16 @@ package uiEdit
 			bg.width = _width;
 			bg.height = _height;
 			
-			uiLoader.width = _width;
-			uiLoader.height = _height;
+			if(_width > 0)
+				uiLoader.width = _width;
+			if(_height > 0)
+				uiLoader.height = _height;
+			
+			onLabelComplete();
+			showTxt();
 		}
 		
-		private var _width:Number;
+		private var _width:Number = 0;
 
 		override public function get width():Number
 		{

@@ -13,8 +13,6 @@
 */
 package uiEdit
 {
-	import asSkinStyle.ReflPositionInfo;
-	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Shape;
@@ -32,12 +30,15 @@ package uiEdit
 	import flash.ui.Keyboard;
 	import flash.utils.getQualifiedClassName;
 	
+	import asSkinStyle.ReflPositionInfo;
+	
 	import sparrowGui.SparrowMgr;
 	import sparrowGui.components.SButtonText;
 	import sparrowGui.components.SCombobox;
 	import sparrowGui.components.STextField;
 	import sparrowGui.components.SWindow;
 	import sparrowGui.components.ScrollList;
+	import sparrowGui.components.base.BaseComponent;
 	import sparrowGui.components.item.SCheckButton;
 	import sparrowGui.components.item.SListItem;
 	import sparrowGui.components.item.SToggleButton;
@@ -751,8 +752,9 @@ package uiEdit
 					var tarc:DisplayObjectContainer = editMgr.editTarget as DisplayObjectContainer;
 					if(!tarc)
 					{
-						tarc = new Sprite();
+						tarc = new BaseComponent();
 						SparrowMgr.mainDisp.addChild(tarc);
+						editMgr.editTarget = tarc;
 					}
 					loadingContent = deCodeLoader.data;
 					if(editMgr.isAutoDecode)

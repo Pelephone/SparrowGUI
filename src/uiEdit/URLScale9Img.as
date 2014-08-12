@@ -110,7 +110,7 @@ package uiEdit
 			var r:String = eMgr.rootPath;
 			if(!eMgr.useRootPath)
 				r = "";
-			var ur:URLRequest = new URLRequest(r + value);
+			var ur:URLRequest = new URLRequest(r + tmpSrc);
 			if(uiType == "custom")
 				dLoader.load(ur);
 			else
@@ -228,8 +228,8 @@ package uiEdit
 					bg.source = BitmapTool.toBitmap(uiLoader);
 //				_width = uiLoader.content.width;
 //				_height = uiLoader.content.height;
-				oldWidth = _width;
-				oldHeight = _height;
+				oldWidth = uiLoader.content.width;
+				oldHeight = uiLoader.content.height;
 				
 				if(_labelNormal != null)
 				{
@@ -270,10 +270,13 @@ package uiEdit
 			if(_height>0)
 				bg.height = _height;
 			
-			if(_width > 0)
-				uiLoader.width = _width;
-			if(_height > 0)
-				uiLoader.height = _height;
+			if(uiLoader.content)
+			{
+				if(_width > 0)
+					uiLoader.content.width = _width;
+				if(_height > 0)
+					uiLoader.content.height = _height;
+			}
 			
 			onLabelComplete();
 			showTxt();

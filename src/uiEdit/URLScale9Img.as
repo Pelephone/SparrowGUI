@@ -13,10 +13,6 @@
 */
 package uiEdit
 {
-	import asSkinStyle.ReflPositionInfo;
-	
-	import bitmapEngine.Scale9GridBitmap;
-	
 	import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.display.Sprite;
@@ -28,6 +24,10 @@ package uiEdit
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	
+	import asSkinStyle.ReflPositionInfo;
+	
+	import bitmapEngine.Scale9GridBitmap;
+	
 	import utils.tools.BitmapTool;
 	
 	
@@ -35,7 +35,7 @@ package uiEdit
 	 * 九切片链接图标
 	 * @author Pelephone
 	 */
-	public class URLScale9Img extends Sprite
+	public dynamic class URLScale9Img extends Sprite
 	{
 		public function URLScale9Img()
 		{
@@ -74,7 +74,7 @@ package uiEdit
 			if(_uitype == value)
 				return;
 			_uitype = value;
-			if(_uitype == "scale9")
+			if(_uitype == "scale9" || _uitype == "button2")
 				isScale9 = true;
 			else
 				isScale9 = false;

@@ -28,6 +28,7 @@ package uiEdit
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.system.System;
+	import flash.text.TextField;
 	import flash.utils.ByteArray;
 	
 	import sparrowGui.SparrowMgr;
@@ -236,7 +237,10 @@ package uiEdit
 				var istr:String;
 				for each (istr in uiTypeLs) 
 				{
-					ReflPositionInfo.regRefValue(istr,URLScale9Img);
+					if(istr == "text")
+						ReflPositionInfo.regRefValue(istr,TextField);
+					else
+						ReflPositionInfo.regRefValue(istr,URLScale9Img);
 				}
 			}
 			else if(event.type == IOErrorEvent.IO_ERROR)

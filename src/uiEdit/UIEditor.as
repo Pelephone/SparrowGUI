@@ -690,7 +690,11 @@ package uiEdit
 				if(parseMode == 0)
 				{
 					var deXml:XML = XML(destr);
-					ReflPositionInfo.decodeXmlToChild(tarc,deXml);
+					var itemX:Object;
+					for each (itemX in deXml.children()) 
+					{
+						ReflPositionInfo.decodeXmlToChild(tarc,itemX);
+					}
 				}
 				else if(parseMode == 5)
 					loadSrc(editMgr.skinCfgPath);

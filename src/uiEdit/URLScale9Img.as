@@ -131,7 +131,11 @@ package uiEdit
 					bg.parent.removeChild(bg);
 				
 				var deXml:XML = XML(dLoader.data);
-				ReflPositionInfo.decodeXmlToChild(this,deXml);
+				var itemX:Object;
+				for each (itemX in deXml.children()) 
+				{
+					ReflPositionInfo.decodeXmlToChild(this,itemX);
+				}
 			}
 			else
 				trace(_bgSrc + "加载错误");

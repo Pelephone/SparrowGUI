@@ -28,7 +28,6 @@ package uiEdit
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.system.System;
-	import flash.text.TextField;
 	import flash.utils.ByteArray;
 	
 	import sparrowGui.SparrowMgr;
@@ -238,7 +237,7 @@ package uiEdit
 				for each (istr in uiTypeLs) 
 				{
 					if(istr == "text")
-						ReflPositionInfo.regRefValue(istr,TextField);
+						ReflPositionInfo.regRefValue(istr,UIText);
 					else
 						ReflPositionInfo.regRefValue(istr,URLScale9Img);
 				}

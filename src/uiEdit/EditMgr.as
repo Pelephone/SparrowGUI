@@ -121,10 +121,13 @@ package uiEdit
 			fileCfg.addEventListener(Event.CANCEL,onFileSaveEvent);
 			
 			langLoader.addEventListener(Event.COMPLETE,onLangComplete);
+			langLoader.addEventListener(IOErrorEvent.IO_ERROR,onLangComplete);
 		}
 		
 		private function onLangComplete(event:Event):void
 		{
+			if(event.type != Event.COMPLETE)
+				return;
 			var str:String = String(langLoader.data);
 			var ary:Array = str.split("\n");
 			var itStr:String;
@@ -284,6 +287,16 @@ package uiEdit
 		 * 扫描结果
 		 */
 		public var scanLs:Vector.<String>;
+		// 扫描key与路径的映射
+		private var scanMap:Object;
+		
+		// 通过特殊主键获取url
+		public function keyToScanUrl(key:String):String
+		{
+			if(!(key in scanMap))
+				return null;
+			return scanMap[key];
+		}
 		
 		// 扫描文件加载事件
 		private function onScanEvent(event:Event):void
@@ -294,7 +307,21 @@ package uiEdit
 				{
 					// 角色扫描文件
 					scanLs = new Vector.<String>();
+					scanMap = {};
 					var str:String = scanLoader.data;
+					var itemS:String;
+					for each (itemS in str.split("\n")) 
+					{
+						var itl:Array = itemS.split("|");
+						if(itl.length>1)
+						{
+							scanLs.push(itl[0]);
+							scanMap[itl[1]] = itl[0];
+						}
+						else
+							scanLs.push(itemS);
+					}
+					
 					scanLs = Vector.<String>(str.split("\n"));
 					sendModelNote(EditMgr.SCAN_COMPLETE);
 					break;

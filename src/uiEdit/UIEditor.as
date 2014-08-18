@@ -13,6 +13,8 @@
 */
 package uiEdit
 {
+	import asSkinStyle.ReflPositionInfo;
+	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Shape;
@@ -22,6 +24,9 @@ package uiEdit
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
+	import flash.net.FileFilter;
+	import flash.net.FileReference;
+	import flash.net.FileReferenceList;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.text.TextField;
@@ -29,8 +34,6 @@ package uiEdit
 	import flash.text.TextFormatAlign;
 	import flash.ui.Keyboard;
 	import flash.utils.getQualifiedClassName;
-	
-	import asSkinStyle.ReflPositionInfo;
 	
 	import sparrowGui.SparrowMgr;
 	import sparrowGui.components.SButtonText;
@@ -114,6 +117,8 @@ package uiEdit
 		private var txtBgSrc:STextField;
 		// 移除元素
 		private var btnRemove:SButtonText;
+		// 添加元素
+		private var btnAdd:SButtonText;
 		
 		// 编辑模式切换
 		private var btnEditMode:SToggleButton;
@@ -370,6 +375,10 @@ package uiEdit
 			txtBgSrc.selectable = false;
 			childModeSP.addChild(txtBgSrc);
 			
+			btnAdd = new SButtonText();
+			btnAdd.name = "btnAdd";
+			childModeSP.addChild(btnAdd);
+			
 			btnRemove = new SButtonText();
 			btnRemove.name = "btnRemove";
 			childModeSP.addChild(btnRemove);
@@ -377,7 +386,8 @@ package uiEdit
 			
 			labelUIType.text = "ui类型";
 			labelBgSrc.text = "背景路径";
-			btnRemove.text = "删除元素";
+			btnRemove.text = "删";
+			btnAdd.text = "添";
 			txtXYLabel.text = "x×y:";
 			txtLabel1.text = "×";
 			txtWHLabel.text = "宽×高:";
@@ -428,9 +438,11 @@ package uiEdit
 			editMgr.addEventListener(EditMgr.CFG_COMPLETE,onCfgComplete);
 			editMgr.addEventListener(EditMgr.DECODE_SAVE_COMPLETE,onDecodeComplete);
 			editMgr.addEventListener(EditMgr.DECODE_LOAD_COMPLETE,onDecodeComplete);
-			txtBgSrc.addEventListener(MouseEvent.MOUSE_DOWN,onDragBgSrc);
+//			txtBgSrc.addEventListener(MouseEvent.MOUSE_DOWN,onDragBgSrc);
+			txtBgSrc.addEventListener(MouseEvent.CLICK,onDragBgSrc);
 			cbUIType.addEventListener(ListEvent.LIST_ITEM_SELECT,onUITypeChange);
 			btnRemove.addEventListener(MouseEvent.CLICK,onRemoveTarget);
+			btnAdd.addEventListener(MouseEvent.CLICK,onAddElm);
 			
 			editMgr.uiEditView = this;
 			
@@ -440,11 +452,65 @@ package uiEdit
 			this.mouseEnabled = false;
 		}
 		
+		
 		// 保存完毕
 		private function onDecodeComplete(event:Event):void
 		{
 			this.mouseChildren = true;
 			txtInput.text = editMgr.saveStr;
+		}
+		
+		//---------------------------------------------------
+		// 添加和删除元素
+		//---------------------------------------------------
+		
+		
+		private var _addF:FileReferenceList;
+		
+		public function get addF():FileReferenceList
+		{
+			if(!_addF)
+			{
+				_addF = new FileReferenceList();
+				_addF.addEventListener(Event.SELECT,onAddSelect);
+			}
+			return _addF;
+		}
+		
+		// 选好了要添加的元素
+		private function onAddSelect(e:Event):void
+		{
+			var dspc:DisplayObjectContainer = editMgr.editTarget as DisplayObjectContainer;
+			var item:FileReference;
+			for each (item in addF.fileList) 
+			{
+				var keyInt:int = int(item.modificationDate.time*0.001) + item.size;
+				var key:String = item.name + keyInt;
+				var url:String = editMgr.keyToScanUrl(key);
+				if(!url)
+					continue;
+				var child:URLScale9Img = new URLScale9Img();
+				child.uiType = "img";
+				child.bgSrc = url;
+				dspc.addChild(child);
+			}
+		}		
+		
+		private var filterTypeLs:Array = null;
+		
+		// 添加元素
+		private function onAddElm(e:MouseEvent):void
+		{
+			if(!filterTypeLs)
+			{
+				filterTypeLs = [];
+				filterTypeLs.push(new FileFilter("Images", "*.jpg;*.jpeg;*.png;*.bmp"));
+			}
+			addF.browse(filterTypeLs);
+			if(editMgr.editTarget is DisplayObjectContainer)
+				return;
+			editMgr.editTarget = new Sprite();
+			SparrowMgr.mainDisp.addChild(editMgr.editTarget);
 		}
 		
 		private function onRemoveTarget(event:MouseEvent):void
@@ -464,12 +530,44 @@ package uiEdit
 			setEditTarget(null);
 		}
 		
-		private function onUITypeChange(e:Event):void
+		// end 添加删除元素
+		
+		//---------------------------------------------------
+		// 更换元素路径
+		//---------------------------------------------------
+		
+		private var _bgSrcFile:FileReference;
+
+		public function get bgSrcFile():FileReference
 		{
-			if(!editMgr.editTarget)
+			if(!_bgSrcFile)
+			{
+				_bgSrcFile = new FileReference();
+				_bgSrcFile.addEventListener(Event.SELECT,onNewSrcChange);
+			}
+			return _bgSrcFile;
+		}
+		
+		// 更换路径
+		private function onNewSrcChange(e:Event):void
+		{
+			var keyInt:int = int(bgSrcFile.modificationDate.time*0.001) + bgSrcFile.size;
+			var key:String = bgSrcFile.name + keyInt;
+			var url:String = editMgr.keyToScanUrl(key);
+			changeBgSrc(url);
+			
+		}
+		
+		private function changeBgSrc(bgSrc:String):void
+		{
+			if(!bgSrc || !editMgr.editTarget)
 				return;
-			if(editMgr.editTarget.hasOwnProperty("uiType"))
-				editMgr.editTarget["uiType"] = String(cbUIType.selectData);
+			txtBgSrc.text = bgSrc;
+			txtBgSrc.scrollH = (bgSrc.length - 1)*12;
+			if(editMgr.editTarget.hasOwnProperty("bgSrc"))
+				editMgr.editTarget["bgSrc"] = bgSrc;
+			var outSrc:String = bgSrc.replace(editMgr.rootPath,"");
+			this.stage.dispatchEvent(new EditEvent("dragLibObject",[outSrc,editMgr.editTarget,editMgr.cfgData]));
 		}
 		
 		private var lineSp:Shape = new Shape();
@@ -505,16 +603,11 @@ package uiEdit
 					else if(editMgr.isTargetInPanel(e.target as DisplayObject,navView))
 						bgSrc = navView.preImg.src;
 					
-					if(bgSrc)
-					{
-						txtBgSrc.text = bgSrc;
-						txtBgSrc.scrollH = (bgSrc.length - 1)*12;
-						if(editMgr.editTarget.hasOwnProperty("bgSrc"))
-							editMgr.editTarget["bgSrc"] = bgSrc;
-						var outSrc:String = bgSrc.replace(editMgr.rootPath,"");
-						this.stage.dispatchEvent(new EditEvent("dragLibObject",[outSrc,editMgr.editTarget,editMgr.cfgData]));
-					}
+					changeBgSrc(bgSrc);
 				}
+				case MouseEvent.CLICK:
+					bgSrcFile.browse(filterTypeLs);
+					break;
 				default:
 				{
 					if(lineSp.parent)
@@ -528,11 +621,24 @@ package uiEdit
 			}
 		}
 		
+		// end 更换元素路径------
+		
+		private function onUITypeChange(e:Event):void
+		{
+			if(!editMgr.editTarget)
+				return;
+			if(editMgr.editTarget.hasOwnProperty("uiType"))
+				editMgr.editTarget["uiType"] = String(cbUIType.selectData);
+		}
+		
 		private function onCfgComplete(event:Event):void
 		{
 			cbUIType.data = editMgr.uiTypeLs;
-			btnEditMode.visible = editMgr.isChild;
 			cbMode.visible = editMgr.isChild
+//			btnEditMode.visible = editMgr.isChild;
+			btnEditMode.visible = false;
+			btnEditMode.selected = editMgr.isChild;
+			onEditModeChange();
 		}
 		
 		private function onShowOutInfo(e:EditEvent):void
@@ -543,7 +649,7 @@ package uiEdit
 		public var navView:NavLibView = new NavLibView();
 		
 		// 编辑模式 改变
-		private function onEditModeChange(e:Event):void
+		private function onEditModeChange(e:Event=null):void
 		{
 			if(btnEditMode.selected)
 			{
@@ -551,8 +657,8 @@ package uiEdit
 				txtInput.y = 92;
 				txtInput.height = 88;
 				var aa:* = SparrowMgr.mainDisp;
-				if(SparrowMgr.mainDisp != null)
-					SparrowMgr.mainDisp.addChild(navView);
+//				if(SparrowMgr.mainDisp != null)
+//					SparrowMgr.mainDisp.addChild(navView);
 			}
 			else
 			{
@@ -560,8 +666,8 @@ package uiEdit
 				txtInput.height = 120;
 				txtInput.y = 60;
 				
-				if(navView.parent != null)
-					navView.parent.removeChild(navView);
+//				if(navView.parent != null)
+//					navView.parent.removeChild(navView);
 			}
 			childModeSP.visible = btnEditMode.selected;
 		}

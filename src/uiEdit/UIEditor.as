@@ -445,6 +445,7 @@ package uiEdit
 			btnAdd.addEventListener(MouseEvent.CLICK,onAddElm);
 			
 			editMgr.uiEditView = this;
+			editMgr.navView = navView;
 			
 			title = "UI编辑器";
 			showModeUpdate();

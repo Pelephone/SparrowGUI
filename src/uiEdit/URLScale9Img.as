@@ -13,6 +13,10 @@
 */
 package uiEdit
 {
+	import asSkinStyle.ReflPositionInfo;
+	
+	import bitmapEngine.Scale9GridBitmap;
+	
 	import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.display.Sprite;
@@ -23,10 +27,6 @@ package uiEdit
 	import flash.net.URLRequest;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
-	
-	import asSkinStyle.ReflPositionInfo;
-	
-	import bitmapEngine.Scale9GridBitmap;
 	
 	import utils.tools.BitmapTool;
 	
@@ -103,14 +103,20 @@ package uiEdit
 				return;
 			_bgSrc = value;
 			
+			if(value == null || value.length == 0)
+			{
+				return;
+			}
+			
 			var eMgr:EditMgr = EditMgr.getInstance();
-			if(value)
-			tmpSrc = value.replace(eMgr.rootPath,"");
+			tmpSrc = value.replace(/\\/g,"/");
+			tmpSrc = tmpSrc.replace(eMgr.rootPath,"");
 			
 			var r:String = eMgr.rootPath;
-			if(!eMgr.useRootPath)
+			if(!eMgr.useRootPath || tmpSrc.indexOf(":/")>=0)
 				r = "";
-			var ur:URLRequest = new URLRequest(r + tmpSrc);
+			var u2:String = r + tmpSrc;
+			var ur:URLRequest = new URLRequest(u2);
 			if(uiType == "custom")
 				dLoader.load(ur);
 			else
@@ -291,7 +297,14 @@ package uiEdit
 		override public function get width():Number
 		{
 			if(_width == 0)
-				return super.width;
+			{
+				if(bg.width>0)
+					return bg.width;
+				else if(uiLoader.content && uiLoader.content.width>0)
+					return uiLoader.content.width;
+				else
+					return super.width;
+			}
 			return _width;
 		}
 
@@ -309,7 +322,15 @@ package uiEdit
 		override public function get height():Number
 		{
 			if(_height == 0)
+			{
+				
+				if(bg.height>0)
+					return bg.height;
+				else if(uiLoader.content && uiLoader.content.height>0)
+					return uiLoader.content.height;
+				else
 				return super.height;
+			}
 			return _height;
 		}
 

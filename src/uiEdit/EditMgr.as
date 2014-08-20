@@ -17,6 +17,7 @@ package uiEdit
 	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
+	import flash.display.Sprite;
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -433,7 +434,8 @@ package uiEdit
 		
 		public var curDragDsp:EditURLImg = new EditURLImg();
 		
-		public var uiEditView:UIEditor;
+		public var uiEditView:Sprite;
+		public var navView:Sprite;
 		
 		/**
 		 * 按下对象是否在编辑面板
@@ -443,7 +445,7 @@ package uiEdit
 			var isIn:Boolean = isTargetInPanel(tar,uiEditView);
 			if(isIn)
 				return true;
-			isIn = isTargetInPanel(tar,uiEditView.navView);
+			isIn = isTargetInPanel(tar,navView);
 			if(isIn)
 				return true;
 			return false;
@@ -574,7 +576,7 @@ package uiEdit
 				saveStr = xml;
 				fileCfg.save(d,saveName);
 			}
-			System.setClipboard(saveStr);
+//			System.setClipboard(saveStr);
 			sendModelNote(EditMgr.DECODE_LOAD_COMPLETE);
 		}
 		

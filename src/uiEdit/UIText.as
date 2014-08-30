@@ -26,5 +26,7 @@ package uiEdit
 		{
 			super();
 		}
+		
+		public var uiType:String = "text";
 	}
 }

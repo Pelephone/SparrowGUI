@@ -25,6 +25,8 @@ package uiEdit
 		public function UIText()
 		{
 			super();
+			
+			selectable = false;
 		}
 		
 		public var uiType:String = "text";

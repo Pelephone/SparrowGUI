@@ -241,7 +241,7 @@ package uiEdit
 				{
 					if(istr == "text")
 						ReflPositionInfo.regRefValue(istr,UIText);
-					if(istr == "list")
+					else if(istr == "list")
 						ReflPositionInfo.regRefValue(istr,UIList);
 					else
 						ReflPositionInfo.regRefValue(istr,URLScale9Img);

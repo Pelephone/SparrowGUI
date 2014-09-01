@@ -1,9 +1,13 @@
 package uiEdit
 {
-	import flash.display.Sprite;
-	import flash.geom.Rectangle;
+	import asSkinStyle.ReflPositionInfo;
 	
-	import sparrowGui.utils.SparrowUtil;
+	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.events.IOErrorEvent;
+	import flash.geom.Rectangle;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
 	
 	/**
 	 * 列表组件
@@ -16,14 +20,14 @@ package uiEdit
 			super();
 			
 			height = 120;
-			
-			SparrowUtil.addNextCall(recreateItems);
 		}
 		
 		private var _bgSrc:String;
 
 		public function get bgSrc():String
 		{
+			if(tmpSrc)
+				return tmpSrc;
 			return _bgSrc;
 		}
 
@@ -32,9 +36,41 @@ package uiEdit
 //			if(_itemSrc == value)
 //				return;
 			_bgSrc = value;
-			recreateItems();
+			
+			var eMgr:EditMgr = EditMgr.getInstance();
+			tmpSrc = value.replace(/\\/g,"/");
+			tmpSrc = tmpSrc.replace(eMgr.rootPath,"");
+			
+			var r:String = eMgr.rootPath;
+			if(!eMgr.useRootPath || tmpSrc.indexOf(":/")>=0)
+				r = "";
+			var u2:String = r + tmpSrc;
+			var ur:URLRequest = new URLRequest(u2);
+			itemLoader.load(ur);
 		}
+		
+		private var tmpSrc:String;
 
+		private var _itemLoader:URLLoader;
+
+		public function get itemLoader():URLLoader
+		{
+			if(_itemLoader == null)
+			{
+				_itemLoader = new URLLoader();
+				_itemLoader.addEventListener(Event.COMPLETE,onItemComplete);
+				_itemLoader.addEventListener(IOErrorEvent.IO_ERROR,onItemComplete);
+			}
+			return _itemLoader;
+		}
+		
+		private function onItemComplete(e:Event):void
+		{
+			if(e.type == Event.COMPLETE)
+				recreateItems();
+			else
+				trace("UIList.bgSrc:",_bgSrc,"加载错误");
+		}
 		
 		public var rowHeight:int;
 		
@@ -65,7 +101,14 @@ package uiEdit
 			{
 				var itm:URLScale9Img = new URLScale9Img();
 				itm.uiType = "custom";
-				itm.bgSrc = _bgSrc;
+				
+				var deXml:XML = XML(itemLoader.data);
+				var itemX:Object;
+				for each (itemX in deXml.children()) 
+				{
+					ReflPositionInfo.decodeXmlToChild(itm,itemX);
+				}
+				
 				addChild(itm);
 				if(i && (i%colNum)==0)
 				{

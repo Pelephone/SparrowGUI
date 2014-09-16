@@ -22,20 +22,20 @@ package uiEdit
 			height = 120;
 		}
 		
-		private var _bgSrc:String;
+		private var _itemSrc:String;
 
-		public function get bgSrc():String
+		public function get itemSrc():String
 		{
 			if(tmpSrc)
 				return tmpSrc;
-			return _bgSrc;
+			return _itemSrc;
 		}
 
-		public function set bgSrc(value:String):void
+		public function set itemSrc(value:String):void
 		{
 //			if(_itemSrc == value)
 //				return;
-			_bgSrc = value;
+			_itemSrc = value;
 			
 			var eMgr:EditMgr = EditMgr.getInstance();
 			tmpSrc = value.replace(/\\/g,"/");
@@ -69,7 +69,7 @@ package uiEdit
 			if(e.type == Event.COMPLETE)
 				recreateItems();
 			else
-				trace("UIList.bgSrc:",_bgSrc,"加载错误");
+				trace("UIList.bgSrc:",_itemSrc,"加载错误");
 		}
 		
 		public var rowHeight:int;
@@ -81,6 +81,20 @@ package uiEdit
 		public var spaceY:int = 10;
 		
 		public var colNum:int = 0;
+		
+		private var _spacing:int;
+
+		public function get spacing():int
+		{
+			return _spacing;
+		}
+
+		public function set spacing(value:int):void
+		{
+			spaceX = value;
+			spaceY = value;
+			_spacing = value;
+		}
 		
 		
 		/**

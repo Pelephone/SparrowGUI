@@ -93,6 +93,8 @@ package uiEdit
 			
 			return _bgSrc;
 		}
+		
+		public var linkageVars:String;
 
 		/**
 		 * @private
@@ -102,6 +104,8 @@ package uiEdit
 			if(_bgSrc == value)
 				return;
 			_bgSrc = value;
+			if(uiType == "resText")
+				linkageVars = value;
 			
 			if(value == null || value.length == 0)
 			{

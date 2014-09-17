@@ -74,7 +74,7 @@ package uiEdit
 			if(_uitype == value)
 				return;
 			_uitype = value;
-			if(_uitype == "scale9" || _uitype == "button2")
+			if(_uitype == "scale9" || _uitype == "button2" || _uitype == "progress")
 				isScale9 = true;
 			else
 				isScale9 = false;

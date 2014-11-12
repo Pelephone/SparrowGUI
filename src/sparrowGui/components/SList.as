@@ -354,6 +354,15 @@ package sparrowGui.components
 //				return _data[selectIndex];
 		}
 		
+		/**
+		 * 选中项
+		 * @return 
+		 */
+		public function get selectItem():IItem 
+		{
+			return group.getItemAt(selectIndex);
+		}
+		
 		//---------------------------------------------------
 		// 布局相关
 		//---------------------------------------------------

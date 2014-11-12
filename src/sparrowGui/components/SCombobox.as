@@ -59,7 +59,7 @@ package sparrowGui.components
 			var pt:Point = _txtLabel.localToGlobal(AlignMgr.oPoint);
 			AlignMgr.comboboxTipAlign(pt,_popTip,_txtLabel.width,_txtLabel.height);
 			
-			bg.height = popTip.height + oldBgHeight + 5;
+			bg.height = popTip.height + _txtLabel.height + 4;
 			if(_popTip.y < 0)
 				bg.y = popTip.y - 5;
 		}
@@ -81,6 +81,7 @@ package sparrowGui.components
 			bg.addEventListener(MouseEvent.CLICK,onMouseEvent);
 			_comboItem.addEventListener(MouseEvent.CLICK,onMouseEvent);
 			_popTip.addEventListener(Event.CHANGE,onTipPosChange);
+			_popTip.addEventListener(MouseEvent.CLICK,onPopClick);
 			_popTip.addEventListener(ListEvent.LIST_ITEM_SELECT,onSelectEvt);
 			_popTip.addEventListener(Event.CANCEL,onCancel);
 		}
@@ -162,7 +163,7 @@ package sparrowGui.components
 		
 		private function onCancel(e:Event):void
 		{
-			bg.height = oldBgHeight;
+			bg.height = _txtLabel.height + 2;
 			bg.y = oldBgY;
 			_comboItem.setState(ItemState.SELECT,false);
 		}
@@ -178,11 +179,16 @@ package sparrowGui.components
 			else
 				_txtLabel.text = "";
 			
-			bg.height = oldBgHeight;
+			bg.height = _txtLabel.height + 2;
 			bg.y = oldBgY;
 			
 			dispatchEvent(e);
 			
+			closePop();
+		}
+		
+		private function onPopClick(e:MouseEvent):void
+		{
 			closePop();
 		}
 		
@@ -252,6 +258,10 @@ package sparrowGui.components
 			_comboItem.setState(ItemState.SELECT,_selected);
 		}
 		
+		public function get txtLabel():TextField 
+		{
+			return _txtLabel as TextField;
+		}
 		
 		protected var _popTip:SPopupMenu;
 

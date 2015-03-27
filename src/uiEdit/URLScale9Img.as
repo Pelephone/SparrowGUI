@@ -13,12 +13,10 @@
 */
 package uiEdit
 {
-	import asSkinStyle.ReflPositionInfo;
-	
-	import bitmapEngine.Scale9GridBitmap;
-	
 	import flash.display.Bitmap;
+	import flash.display.DisplayObject;
 	import flash.display.Loader;
+	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -27,6 +25,10 @@ package uiEdit
 	import flash.net.URLRequest;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
+	
+	import asSkinStyle.ReflPositionInfo;
+	
+	import bitmapEngine.Scale9GridBitmap;
 	
 	import utils.tools.BitmapTool;
 	
@@ -105,7 +107,11 @@ package uiEdit
 				return;
 			_bgSrc = value;
 			if(uiType == "resText")
+			{
 				linkageVars = value;
+				showTxt();
+				return;
+			}
 			
 			if(value == null || value.length == 0)
 			{
@@ -198,8 +204,46 @@ package uiEdit
 			showTxt();
 		}
 		
+		private var txtNum:int = 0;
+		
 		private function showTxt():void
 		{
+			if(txt != null)
+			{
+				if(uiType == "text")
+					txt.visible = true;
+				else
+					txt.visible = false;
+			}
+			
+			if(uiType == "resText")
+			{
+				var eMgr:EditMgr = EditMgr.getInstance();
+				if(_label == null || _label.length == 0)
+					return;
+				if(resSp.parent == null)
+					addChild(resSp);
+				clearResText();
+				txtNum = _label.length;
+				for (var i:int = 0; i < _label.length; i++) 
+				{
+					var ld:Loader = new Loader();
+					ld.contentLoaderInfo.addEventListener(Event.COMPLETE,onTxtBmpEvt);
+					ld.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,onTxtBmpEvt);
+					var r:String = eMgr.rootPath;
+					tmpSrc = linkageVars.replace("$1",_label.charAt(i));
+					tmpSrc = tmpSrc.replace(/\\/g,"/");
+					tmpSrc = tmpSrc.replace(eMgr.rootPath,"");
+					if(!eMgr.useRootPath || tmpSrc.indexOf(":/")>=0)
+						r = "";
+					var u2:String = r + linkageVars.replace("$1",_label.charAt(i));
+					ld.load(new URLRequest(u2));
+					resSp.addChild(ld);
+				}
+				
+				return;
+			}
+			
 			if(!txt && _label!=null)
 			{
 				txt = new TextField();
@@ -212,7 +256,41 @@ package uiEdit
 			txt.x = width*0.5 - txt.width*0.5;
 			txt.y = height*0.5 - txt.height*0.5;
 		}
-
+		
+		public var itemWidth:int = 0;
+		
+		private var resSp:Sprite = new Sprite();
+		
+		private function onTxtBmpEvt(e:Event):void
+		{
+			var tar:LoaderInfo = e.currentTarget as LoaderInfo;
+			tar.removeEventListener(Event.COMPLETE,onTxtBmpEvt);
+			tar.removeEventListener(IOErrorEvent.IO_ERROR,onTxtBmpEvt);
+			txtNum = txtNum - 1;
+			if(txtNum <= 0)
+			{
+				var lastX:int = 0;
+				for (var i:int = 0; i < resSp.numChildren; i++) 
+				{
+					var dsp:DisplayObject = resSp.getChildAt(i);
+					dsp.x = lastX;
+					lastX = (itemWidth>0)?(lastX + itemWidth):(lastX + dsp.width);
+				}
+			}
+		}
+		
+		private function clearResText():void
+		{
+			for (var i:int = 0; i < resSp.numChildren; i++) 
+			{
+				var dsp:DisplayObject = resSp.getChildAt(i);
+				dsp.loaderInfo.removeEventListener(Event.COMPLETE,onTxtBmpEvt);
+				dsp.loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,onTxtBmpEvt);
+			}
+			resSp.removeChildren();
+			txtNum = 0;
+		}
+		
 		private var txt:TextField;
 		
 		//---------------------------------------------------

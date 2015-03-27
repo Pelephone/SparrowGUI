@@ -24,14 +24,14 @@ package uiEdit
 		
 		private var _itemSrc:String;
 
-		public function get itemSrc():String
+		public function get bgSrc():String
 		{
 			if(tmpSrc)
 				return tmpSrc;
 			return _itemSrc;
 		}
 
-		public function set itemSrc(value:String):void
+		public function set bgSrc(value:String):void
 		{
 //			if(_itemSrc == value)
 //				return;

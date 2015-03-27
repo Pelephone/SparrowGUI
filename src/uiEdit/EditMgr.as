@@ -13,8 +13,6 @@
 */
 package uiEdit
 {
-	import asSkinStyle.ReflPositionInfo;
-	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
@@ -29,6 +27,8 @@ package uiEdit
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.utils.ByteArray;
+	
+	import asSkinStyle.ReflPositionInfo;
 	
 	import sparrowGui.SparrowMgr;
 	import sparrowGui.components.base.BaseTip;
@@ -139,7 +139,7 @@ package uiEdit
 				if(ary2.length<2)
 					continue;
 				var val:String = String(ary2[1]).replace("\r","");
-				ReflPositionInfo.langMap[ary2[0]] = ary2[1];
+//				ReflPositionInfo.langMap[ary2[0]] = ary2[1];
 			}
 		}
 		
@@ -176,6 +176,11 @@ package uiEdit
 		 * 皮肤路径地址
 		 */
 		public var skinCfgPath:String = "assets/skinCfg/$1.xml";
+		
+		/**
+		 * 舞台缩放值
+		 */
+		public var stageScale:Number = 1;
 		
 		/**
 		 * 是否可编辑子项
@@ -215,7 +220,7 @@ package uiEdit
 				ReflPositionInfo.IS_DO_DEFAULT = int(xml.IS_DO_DEFAULT) == 1;
 				ReflPositionInfo.isAttrCode = int(xml.isAttrCode) == 0;
 				ReflPositionInfo.isCreateChild = String(xml.isCreateChild) != "0";
-				ReflPositionInfo.isChangeValue = String(xml.isChangeValue) != "0";
+//				ReflPositionInfo.isChangeValue = String(xml.isChangeValue) != "0";
 				
 				useRootPath = String(xml.useRootPath) != "0";
 				
@@ -223,6 +228,10 @@ package uiEdit
 				UIEditor.VAR_DO_STRING = String(xml.var_tpl2);
 				
 				skinCfgPath = String(xml.skinCfgPath);
+				skinCfgPath = skinCfgPath.replace(/\\/g,"/");
+				
+				if(String(xml.stageScale)!="")
+					stageScale = Number(xml.stageScale)/100;
 				
 				if(int(xml.showKey)!=0)
 				showKey = int(xml.showKey);
@@ -274,6 +283,7 @@ package uiEdit
 		{
 			if(scanFileSrc == src)
 				return;
+			src = src.replace(/\\/g,"/");
 			scanFileSrc = src;
 			var tid:int = src.lastIndexOf("/");
 			if(tid>0)
@@ -535,6 +545,9 @@ package uiEdit
 		{
 			saveData = str;
 			var tid:int = path.lastIndexOf("/");
+			if(tid < 0)
+				tid = path.lastIndexOf("\\");
+			
 			if(tid>0)
 				saveName = path.substring(tid+1);
 			else

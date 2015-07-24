@@ -40,6 +40,12 @@ package sparrowGui.components
 			super.text = value;
 		}
 		
+		/** 功能同text一样,不同的是此方便会把参数转成字符串 */
+		public function set label(obj:Object):void
+		{
+			text = String(obj);
+		}
+		
 		/**
 		 * 考虑到经常会遇到htmlText为空会报错。重写该方法 
 		 * @param value

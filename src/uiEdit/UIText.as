@@ -27,8 +27,33 @@ package uiEdit
 			super();
 			
 			selectable = false;
+			
+			text = "这是系统字";
+			this.multiline = true;
+			this.wordWrap = true;
+			this.border = true;
+			this.borderColor = 0xFFFF00;
 		}
 		
 		public var uiType:String = "text";
+		public var _bgSrc:String;
+		
+		/**
+		 * 背景图片路径
+		 */
+		public function get bgSrc():String
+		{
+			return _bgSrc;
+		}
+		/**
+		 * @private
+		 */
+		public function set bgSrc(value:String):void
+		{
+			if(_bgSrc == value)
+				return;
+			_bgSrc = value;
+			text = value;
+		}
 	}
 }

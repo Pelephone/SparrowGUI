@@ -156,6 +156,8 @@ package uiEdit
 		 */
 		public var uiTypeLs:Vector.<String>;
 		
+		public var uiTypeMap:Object;
+		
 		
 		//---------------------------------------------------
 		// 加载配置
@@ -202,6 +204,15 @@ package uiEdit
 			langLoader.load(new URLRequest("lang.txt?random=" + int(Math.random()*1000)));
 		}
 		
+		// 是否字符串为空
+		private function isEmpty(str:String):Boolean
+		{
+			if(str == null || str.length == 0)
+				return true;
+			else
+			return false;
+		}
+		
 		/**
 		 * 是否用根路径
 		 */
@@ -227,6 +238,10 @@ package uiEdit
 				UIEditor.VAR_STRING = String(xml.var_tpl);
 				UIEditor.VAR_DO_STRING = String(xml.var_tpl2);
 				
+				if(!isEmpty(String(xml.var_tpl3)))
+					UIEditor.EVT_STRING = String(xml.var_tpl3);
+				
+				
 				skinCfgPath = String(xml.skinCfgPath);
 				skinCfgPath = skinCfgPath.replace(/\\/g,"/");
 				
@@ -241,6 +256,17 @@ package uiEdit
 				searchKeyLs = Vector.<String>(String(xml.searchKeyLs).split(","));
 				uiTypeLs = Vector.<String>(String(xml.uiTypeLs).split(","));
 				
+				var uiTypeMapStr:String = String(xml.uiTypeMap);
+				uiTypeMap = {};
+				var ls:Array = uiTypeMapStr.split(",");
+				var itmStr:String;
+				for each (itmStr in ls) 
+				{
+					var ls2:Array = itmStr.split(":");
+					uiTypeMap[ls2[0]] = ls2[1];
+				}
+				
+				
 				loadScanFille(String(xml.scanFile));
 				
 				sendModelNote(EditMgr.CFG_COMPLETE);
@@ -248,12 +274,12 @@ package uiEdit
 				var istr:String;
 				for each (istr in uiTypeLs) 
 				{
-					if(istr == "text")
-						ReflPositionInfo.regRefValue(istr,UIText);
-					else if(istr == "list")
-						ReflPositionInfo.regRefValue(istr,UIList);
-					else
-						ReflPositionInfo.regRefValue(istr,URLScale9Img);
+//					if(istr == "text")
+//						ReflPositionInfo.regRefValue(istr,UIText);
+//					else if(istr == "list")
+//						ReflPositionInfo.regRefValue(istr,UIList);
+//					else
+					ReflPositionInfo.regRefValue(istr,URLScale9Img);
 				}
 			}
 			else if(event.type == IOErrorEvent.IO_ERROR)
@@ -300,7 +326,7 @@ package uiEdit
 		 */
 		public var scanLs:Vector.<String>;
 		// 扫描key与路径的映射
-		private var scanMap:Object;
+		private var scanMap:Object = {};
 		
 		// 通过特殊主键获取url
 		public function keyToScanUrl(key:String):String
@@ -557,6 +583,7 @@ package uiEdit
 		
 		private function onFileSaveEvent(e:Event):void
 		{
+			if(e.type == Event.COMPLETE)
 			sendModelNote(DECODE_SAVE_COMPLETE);
 		}
 		
@@ -577,8 +604,8 @@ package uiEdit
 					xml.insertChildBefore(xml.children()[0],x2);
 					
 				
+				saveStr = xml;
 				d.writeUTFBytes(xml);
-				saveStr = String(xml);
 				fileCfg.save(d,saveName);
 			}
 			else

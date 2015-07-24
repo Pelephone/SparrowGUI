@@ -13,8 +13,6 @@
 */
 package uiEdit
 {
-	import asSkinStyle.ReflPositionInfo;
-	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Shape;
@@ -34,6 +32,8 @@ package uiEdit
 	import flash.text.TextFormatAlign;
 	import flash.ui.Keyboard;
 	import flash.utils.getQualifiedClassName;
+	
+	import asSkinStyle.ReflPositionInfo;
 	
 	import sparrowGui.SparrowMgr;
 	import sparrowGui.components.SButtonText;
@@ -1178,6 +1178,11 @@ package uiEdit
 		 * 变量斌值字符串
 		 */
 		public static var VAR_DO_STRING:String = "$1 = this.getChildByName(\"$2\") as $3;";
+		/**
+		 * 鼠标点击事件字符串
+		 */
+		public static var EVT_STRING:String = "skin.$1.addEventListener(MouseEvent.CLICK, on$2Click);\n" +
+			"skin.$3.removeEventListener(MouseEvent.CLICK, on$4Click);";
 		
 		/**
 		 * 当前选中对象生成变量字符串
@@ -1187,16 +1192,20 @@ package uiEdit
 			var ect:DisplayObjectContainer = editMgr.editTarget as DisplayObjectContainer;
 			if(!ect)
 				return;
+			var strEvt:String = EVT_STRING;
+			strEvt = strEvt.replace("$1",ect.name);
+			strEvt = strEvt.replace("$2",firstUp(ect.name));
+			strEvt = strEvt.replace("$3",ect.name);
+			strEvt = strEvt.replace("$4",firstUp(ect.name));
+			strEvt = strEvt + "\n";
+			
 			var item:DisplayObject;
 			var str:String = "";
 			var str2:String = "";
 			for (var i:int = 0; i < (editMgr.editTarget as DisplayObjectContainer).numChildren; i++) 
 			{
 				item = (editMgr.editTarget as DisplayObjectContainer).getChildAt(i);
-				var typeStr:String = getQualifiedClassName(item);
-				var tid:int = typeStr.lastIndexOf("::");
-				if(tid>0)
-					typeStr = typeStr.substr(tid + 2);
+				var typeStr:String = getTypeStr(item);
 				
 				var str3:String = VAR_STRING.replace("$1",item.name);
 				str3 = str3.replace("$2",typeStr);
@@ -1209,7 +1218,33 @@ package uiEdit
 				str2 = str2 + str4 + "\n";
 			}
 			
-			txtInput.text = str + "\n" + str2;
+			txtInput.text = strEvt + str + "\n" + str2;
+		}
+		
+		// 计算出类型字符串
+		private function getTypeStr(target:Object):String
+		{
+			var typeStr:String = getQualifiedClassName(target);
+			var tid:int = typeStr.lastIndexOf("::");
+			if(tid>0)
+				typeStr = typeStr.substr(tid + 2);
+			
+			if(!target.hasOwnProperty("uiType"))
+				return typeStr;
+			
+			var skinType:String = target["uiType"];
+			if(!editMgr.uiTypeMap || !(skinType in editMgr.uiTypeMap))
+				return typeStr;
+			
+			return editMgr.uiTypeMap[skinType];
+		}
+		
+		// 首字母大写
+		private function firstUp(str:String):String
+		{
+			var w1:String = str.charAt(0).toLocaleUpperCase();
+			str = str.substr(1);
+			return w1 + str;
 		}
 		
 		override protected function onFoldChange(e:Event):void

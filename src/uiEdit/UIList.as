@@ -1,13 +1,16 @@
 package uiEdit
 {
-	import asSkinStyle.ReflPositionInfo;
-	
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	
+	import TimerUtils.FrameTimer;
+	
+	import asSkinStyle.ReflPositionInfo;
 	
 	/**
 	 * 列表组件
@@ -64,10 +67,14 @@ package uiEdit
 			return _itemLoader;
 		}
 		
+		
 		private function onItemComplete(e:Event):void
 		{
 			if(e.type == Event.COMPLETE)
-				recreateItems();
+			{
+				createitem();
+				FrameTimer.delayCall(1000,recreateItems);
+			}
 			else
 				trace("UIList.bgSrc:",_itemSrc,"加载错误");
 		}
@@ -100,45 +107,65 @@ package uiEdit
 		/**
 		 * 重新创建子项
 		 */
-		private function recreateItems():void
+		private function recreateItems(d:*=null):void
 		{
+			var preItem:URLScale9Img = getChildByName("item_0") as URLScale9Img;
 			while(this.numChildren)
 				this.removeChildAt(0);
 			
-			if(colNum == 0)
-				colNum = 1;
 			var tmpY:int = 0;
 			var tmpX:int = 0;
 			var i:int = 0;
-			var lineHeight:int;	//其中一行子项高度最高的项高
+			
+			var itemWidth:int = 0;
+			if(colWidth != 0)
+				itemWidth = colWidth;
+			var itemHeight:int = 0;
+			if(rowHeight != 0)
+				itemHeight = rowHeight;
+			
+			if(itemWidth == 0 && preItem)
+				itemWidth = preItem.width;
+			if(itemHeight == 0 && preItem)
+				itemHeight = preItem.height;
+			
 			while(true)
 			{
-				var itm:URLScale9Img = new URLScale9Img();
-				itm.uiType = "custom";
+				var itm:DisplayObject = createitem();
 				
-				var deXml:XML = XML(itemLoader.data);
-				var itemX:Object;
-				for each (itemX in deXml.children()) 
+				if(i && colNum>0 && i%colNum==0)
 				{
-					ReflPositionInfo.decodeXmlToChild(itm,itemX);
-				}
-				
-				addChild(itm);
-				if(i && (i%colNum)==0)
-				{
-					tmpY = tmpY + spaceY + (rowHeight?rowHeight:lineHeight);
+					tmpY = tmpY + spaceY + itemHeight;
 					tmpX = 0;
-					lineHeight = itm.height;
+				}
+				else if(i && colNum == 0 && (tmpX + itemWidth)>width)
+				{
+					tmpY = tmpY + spaceY + itemHeight;
+					tmpX = 0;
 				}
 				itm.x = tmpX;
-				tmpX = tmpX + (colWidth || itm.width) + spaceX;
+				tmpX = tmpX + itemWidth + spaceX;
 				itm.y = tmpY;
-				if(itm.height>lineHeight)
-					lineHeight = itm.height;
 				
-				if(tmpX > _width || tmpY > _height || ++i>50)
+				if(tmpY > _height || ++i>50)
 					break;
 			}
+		}
+		
+		private function createitem():URLScale9Img
+		{
+			var itm:URLScale9Img = new URLScale9Img();
+			itm.name = "item_" + numChildren;
+			itm.uiType = "custom";
+			
+			var deXml:XML = XML(itemLoader.data);
+			var itemX:Object;
+			for each (itemX in deXml.children()) 
+			{
+				ReflPositionInfo.decodeXmlToChild(itm,itemX);
+			}
+			addChild(itm);
+			return itm;
 		}
 		
 		public var uiType:String = "list";

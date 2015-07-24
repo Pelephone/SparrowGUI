@@ -20,11 +20,13 @@ package uiEdit
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
+	import flash.events.TimerEvent;
 	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.text.TextField;
-	import flash.text.TextFieldAutoSize;
+	
+	import TimerUtils.FrameTimer;
 	
 	import asSkinStyle.ReflPositionInfo;
 	
@@ -50,15 +52,24 @@ package uiEdit
 			dLoader.addEventListener(Event.COMPLETE,onDataLoadComplete);
 			dLoader.addEventListener(IOErrorEvent.IO_ERROR,onDataLoadComplete);
 			
+			
 			labelLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,onLabelComplete);
 			labelLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,onLabelComplete);
-			addChild(labelLoader);
 			
 			this.mouseChildren = false;
 			this.mouseEnabled = true;
 		}
 		
+		override public function set name(value:String):void
+		{
+			super.name = value;
+		}
+		
+		private var uLs:UIList = null;
+		
 		private var _uitype:String;
+		// 创建宽高属性
+		public var doWH:Boolean = false;
 
 		/**
 		 * UI类型
@@ -75,11 +86,73 @@ package uiEdit
 		{
 			if(_uitype == value)
 				return;
+			
+			bg.visible = false;
+			uiLoader.visible = false;
+			if(txt)
+			txt.visible = false;
+			if(resSp)
+			resSp.visible = false;
+			if(uLs)
+			uLs.visible = false;
+			labelLoader.visible = false;
+
+			doWH = false;
+			isScale9 = false;
+			
 			_uitype = value;
 			if(_uitype == "scale9" || _uitype == "button2" || _uitype == "progress")
+			{
+				if(_uitype == "button2")
+				{
+					addChild(labelLoader);
+					labelLoader.visible = true;
+				}
+				
+				doWH = true;
+				bg.visible = true;
+				uiLoader.visible = true;
 				isScale9 = true;
+			}
+			else if(_uitype == "text")
+			{
+				if(!txt)
+				{
+					txt = new TextField();
+					txt.text = "这是系统字";
+					txt.border = true;
+					txt.borderColor = 0x00FF00;
+					addChild(txt);
+				}
+				doWH = true;
+				txt.visible = true;
+			}
+			else if(_uitype == "resText")
+			{
+				if(!resSp)
+				{
+					resSp = new Sprite()
+					addChild(resSp);
+				}
+				resSp.visible = true
+			}
+			else if(_uitype == "list")
+			{
+				if(!uLs)
+				{
+					uLs = new UIList();
+					uLs.name = "uLs";
+					addChild(uLs);
+				}
+				uLs.visible = true;
+				doWH = true;
+			}
 			else
-				isScale9 = false;
+			{
+				bg.visible = true;
+				uiLoader.visible = true;
+			}
+			
 			draw();
 		}
 
@@ -90,6 +163,12 @@ package uiEdit
 		 */
 		public function get bgSrc():String
 		{
+			if(uiType == "text")
+				return null;
+			
+			if(uiType == "resText")
+				return linkageVars;
+			
 			if(tmpSrc)
 				return tmpSrc;
 			
@@ -106,10 +185,20 @@ package uiEdit
 			if(_bgSrc == value)
 				return;
 			_bgSrc = value;
+			bg.name = value;
+			
+			var str2:String = value.replace("_0.png","_$1.png");
+			linkageVars = str2;
+			
 			if(uiType == "resText")
 			{
-				linkageVars = value;
+				_label = "0";
 				showTxt();
+				return;
+			}
+			else if(uiType == "list")
+			{
+				uLs.bgSrc = value;
 				return;
 			}
 			
@@ -161,10 +250,12 @@ package uiEdit
 		// 标签文字
 		//---------------------------------------------------
 		
-		private var _labelNormal:String;
+		private var _labelNormal:String = null;
 		
 		public function get labelNormal():String
 		{
+			if(uiType != "resText" && uiType != "button2")
+				return null;
 			return _labelNormal;
 		}
 		
@@ -172,21 +263,48 @@ package uiEdit
 		{
 			if(_labelNormal == value)
 				return;
+			if(uiType == "resText")
+			{
+				label = value;
+				return;
+			}
+			if(uiType != "button2")
+				return;
 			_labelNormal = value;
+			
+			if(_labelNormal != null)
+			{
+				var eMgr:EditMgr = EditMgr.getInstance();
+				var r:String = eMgr.rootPath;
+				if(!eMgr.useRootPath)
+					r = "";
+				labelLoader.load(new URLRequest(r + _labelNormal));
+			}
 		}
 		
 		private var labelLoader:Loader = new Loader();
 		
 		private function onLabelComplete(event:Event=null):void
 		{
-			if(Event.COMPLETE)
+			if(!labelLoader || !labelLoader.visible)
 			{
-				labelLoader.x = width * 0.5 - labelLoader.width * 0.5;
-				labelLoader.y = height * 0.5 - labelLoader.height * 0.5;
+				return;
 			}
-			else
-				trace(_labelNormal + "加载失败");
+			if(!delayLabel)
+			{
+				delayLabel = new FrameTimer();
+				delayLabel.addEventListener(TimerEvent.TIMER_COMPLETE,onLabelPosi);
+			}
+			delayLabel.restart(1000,1);
 		}
+		
+		private function onLabelPosi(e:TimerEvent):void
+		{
+			labelLoader.x = width * 0.5 - labelLoader.width * 0.5;
+			labelLoader.y = height * 0.5 - labelLoader.height * 0.5;
+		}
+		
+		private var delayLabel:FrameTimer = null;
 		
 		private var _label:String = null;
 
@@ -208,21 +326,11 @@ package uiEdit
 		
 		private function showTxt():void
 		{
-			if(txt != null)
-			{
-				if(uiType == "text")
-					txt.visible = true;
-				else
-					txt.visible = false;
-			}
-			
 			if(uiType == "resText")
 			{
 				var eMgr:EditMgr = EditMgr.getInstance();
 				if(_label == null || _label.length == 0)
 					return;
-				if(resSp.parent == null)
-					addChild(resSp);
 				clearResText();
 				txtNum = _label.length;
 				for (var i:int = 0; i < _label.length; i++) 
@@ -244,22 +352,19 @@ package uiEdit
 				return;
 			}
 			
-			if(!txt && _label!=null)
-			{
-				txt = new TextField();
-				txt.autoSize = TextFieldAutoSize.LEFT;
-				addChild(txt);
-			}
 			if(!txt)
 				return;
-			txt.text = _label;
-			txt.x = width*0.5 - txt.width*0.5;
-			txt.y = height*0.5 - txt.height*0.5;
+			if(_label != null)
+			{
+				txt.text = _label;
+				txt.x = width*0.5 - txt.width*0.5;
+				txt.y = height*0.5 - txt.height*0.5;
+			}
 		}
 		
 		public var itemWidth:int = 0;
 		
-		private var resSp:Sprite = new Sprite();
+		private var resSp:Sprite = null;
 		
 		private function onTxtBmpEvt(e:Event):void
 		{
@@ -284,8 +389,11 @@ package uiEdit
 			for (var i:int = 0; i < resSp.numChildren; i++) 
 			{
 				var dsp:DisplayObject = resSp.getChildAt(i);
-				dsp.loaderInfo.removeEventListener(Event.COMPLETE,onTxtBmpEvt);
-				dsp.loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,onTxtBmpEvt);
+				if(dsp.loaderInfo)
+				{
+					dsp.loaderInfo.removeEventListener(Event.COMPLETE,onTxtBmpEvt);
+					dsp.loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,onTxtBmpEvt);
+				}
 			}
 			resSp.removeChildren();
 			txtNum = 0;
@@ -358,9 +466,22 @@ package uiEdit
 			}
 			
 			if(_width>0)
+			{
 				bg.width = _width;
+				if(uLs)
+					uLs.width = _width;
+				if(txt && txt.visible)
+					txt.width = _width;
+					
+			}
 			if(_height>0)
+			{
 				bg.height = _height;
+				if(uLs)
+					uLs.height = _height;
+				if(txt && txt.visible)
+					txt.height = _height;
+			}
 			
 			if(uiLoader.content)
 			{
